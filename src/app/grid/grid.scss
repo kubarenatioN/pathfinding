@@ -1,0 +1,23 @@
+.grid {
+  display: inline-block;
+}
+.cell {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #555;
+  &.non-walkable {
+    background-color: #333;
+  }
+}
+.row {
+  display: flex;
+}
+.cell.start{
+  background-color: lime;
+}
+.cell.end{
+  background-color: tomato;
+}
+.cell.visited{
+  background-color: yellow;
+}
