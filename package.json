@@ -11,6 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "pathfinding": "^0.4.18",
+    "three": "^0.130.1"
+  },
+  "devDependencies": {
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.2.0",
     "mini-css-extract-plugin": "^1.6.0",

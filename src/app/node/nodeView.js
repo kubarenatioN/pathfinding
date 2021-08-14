@@ -1,6 +1,5 @@
 export class NodeView {
 
-  redrawGrid = undefined
 
   constructor(node) {
     this.node = node
@@ -8,14 +7,15 @@ export class NodeView {
     this.el.classList.add(...this.classes)
     this.el.addEventListener('click', () => {
       this.toggleWalkability()
-      this.redrawGrid && this.redrawGrid()
     })
+    this.redrawPath = undefined
   }
 
   toggleWalkability() {
     if (this.isStart || this.isEnd) return
     this.node.walkable = !this.node.walkable
-    // console.log(this.node)
+    this.redrawPath && this.redrawPath()
+    this.updateClasses()
   }
 
   set setIsStart(val) {
@@ -25,6 +25,7 @@ export class NodeView {
 
   set setIsEnd(val) {
     this.isEnd = val
+    this.isVisited = false
     this.updateClasses()
   }
 

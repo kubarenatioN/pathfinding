@@ -14,10 +14,12 @@ export class Grid {
     this.start = start
     this.end = end
     this.grid = []
+    this.visitedNodes = []
     this.createGrid()
   }
 
   createGrid() {
+    console.log('draw grid');
     this.grid = []
     this.gridView && this.gridView.remove()
 
@@ -30,9 +32,8 @@ export class Grid {
       for (let j = 0; j < this.sizex; j++) {
         const pfnode = this.pfgrid.nodes[i][j]
         const node = new NodeView(pfnode)
-
-        node.redrawGrid = () => {
-          this.createGrid()
+        node.redrawPath = () => {
+          this.redrawPath()
         }
         gridRow.push(node)
         row.append(node.el)
@@ -45,6 +46,7 @@ export class Grid {
     this.setListeners()
     this.setStart()
     this.setEnd()
+    this.redrawPath()
   }
 
   findPath() {
@@ -60,8 +62,6 @@ export class Grid {
   setEnd() {
     const [x, y] = this.end
     this.grid[y][x].setIsEnd = true
-    const nodes = this.findPath(this.start, this.end)
-    this.colorNodes(nodes)
   }
 
   colorNodes(nodes) {
@@ -71,21 +71,38 @@ export class Grid {
     })
   }
 
+  clearVisited() {
+    this.visitedNodes.forEach(([x, y]) => {
+      this.grid[y][x].setVisited = false
+    })
+  }
+
+  clearEnd() {
+    const [x, y] = this.end
+    this.grid[y][x].setIsEnd = false
+  }
+
   setListeners() {
     this.gridView.addEventListener('contextmenu', (e) => {
       e.preventDefault()
       if (e.button !== 2) return
-      const pos = this.getNodePosition(e.clientX - this.gridView.offsetLeft, e.clientY - this.gridView.offsetTop)
-      this.end = pos
-      this.onUpdate && this.onUpdate()
+      this.lastClickPos = this.getNodePosition(e.clientX - this.gridView.offsetLeft, e.clientY - this.gridView.offsetTop)
+      this.clearEnd()
+      this.end = this.lastClickPos
+      this.setEnd()
+      this.redrawPath()
     })
+  }
+
+  redrawPath() {
+    this.clearVisited()
+    this.visitedNodes = this.findPath(this.start, this.end)
+    this.colorNodes(this.visitedNodes)
   }
 
   getNodePosition(x, y) {
     const gridW = this.gridView.clientWidth
     const gridH = this.gridView.clientHeight
-    const nodeW = gridW / this.sizex
-    const nodeH = gridH / this.sizey
     return [
       Math.floor(x / gridW * this.sizex),
       Math.floor(y / gridH * this.sizey)

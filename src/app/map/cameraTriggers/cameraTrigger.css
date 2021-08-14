@@ -1,0 +1,61 @@
+.camera-trigger {
+  position: fixed;
+  background-color: rgba(255, 50, 50, 0.2);
+}
+.camera-trigger:hover {
+  background-color: #f22;
+}
+
+.camera-trigger--left {
+  width: 10px;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+}
+.camera-trigger--right {
+  width: 10px;
+  right: 0;
+  top: 10px;
+  bottom: 10px;
+}
+.camera-trigger--top {
+  height: 10px;
+  left: 10px;
+  right: 10px;
+  top: 0;
+}
+.camera-trigger--bottom {
+  height: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+}
+
+.camera-trigger--top-left {
+  height: 10px;
+  width: 10px;
+  top: 0;
+  left: 0;
+  background-color: #99f;
+}
+.camera-trigger--top-right {
+  height: 10px;
+  width: 10px;
+  top: 0;
+  right: 0;
+  background-color: #99f;
+}
+.camera-trigger--bottom-left {
+  height: 10px;
+  width: 10px;
+  bottom: 0;
+  left: 0;
+  background-color: #99f;
+}
+.camera-trigger--bottom-right {
+  height: 10px;
+  width: 10px;
+  bottom: 0;
+  right: 0;
+  background-color: #99f;
+}
