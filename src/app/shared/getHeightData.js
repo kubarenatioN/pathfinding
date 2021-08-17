@@ -25,7 +25,6 @@ export function getHeightData(img, scale = 1) {
       else rowsData[i][j] = 0
     }    
   }
-console.log(rowsData);
   return rowsData
 }
 

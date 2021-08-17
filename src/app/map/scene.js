@@ -1,9 +1,14 @@
 import * as THREE from 'three'
 import { CubeTextureLoader } from 'three'
-import {CameraTrigger} from './cameraTriggers/cameraTrigger'
-import {CameraParams} from './cameraParams/cameraParams'
+import { CameraTrigger } from './cameraTriggers/cameraTrigger'
+import { CameraParams } from './cameraParams/cameraParams'
+import { CONSTANTS } from '../shared/constants'
+import { convertCoordsFromCenterToLeftTop } from '../shared/convertCoords'
 
 export class GameScene {
+
+  onMove
+
   constructor() {
     this.refreshViewportSize()
     this.scene = new THREE.Scene()
@@ -19,28 +24,52 @@ export class GameScene {
 
     // this.createModel()
     this.setResizeHandler()
+    this.setRaycasting()
   }
 
   render() {
-    this.animate()
-  }
-
-  animate() {
-    requestAnimationFrame(this.animate.bind(this))
     this.renderer.render(this.scene, this.camera)
   }
 
-  // createModel() {
-  //   const geometry = new THREE.BoxGeometry()
-  //   geometry.computeFaceNormals()
-  //   geometry.computeVertexNormals();
-  //   const material = new THREE.MeshLambertMaterial({ 
-  //     side: THREE.DoubleSide,
-  //     color: '#ccc'
-  //   })
-  //   const cube = new THREE.Mesh(geometry, material)
-  //   this.scene.add(cube)
-  // }
+  setRaycasting() {
+    this.raycaster = new THREE.Raycaster()
+    this.mouse = new THREE.Vector2()
+    this.renderer.domElement.addEventListener('contextmenu', this.walk)
+  }
+
+  walk = (e) => {
+    e.preventDefault()
+    let coords
+    this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
+    this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1
+    this.raycaster.setFromCamera(this.mouse, this.camera)
+    const intersects = this.raycaster.intersectObjects(this.scene.children)
+    if (!intersects.map(i => i.object.name).includes('map')) return
+    coords = this.getCoordsUnderMouse(e)
+    let gridCoords = convertCoordsFromCenterToLeftTop(coords.x, coords.z, CONSTANTS.MAP_WIDTH, CONSTANTS.MAP_HEIGHT)
+    gridCoords = gridCoords.map(c => Math.floor(c))
+    console.log('coords:', gridCoords, coords);
+    this.onMove(gridCoords, coords)
+  }
+
+  getCoordsUnderMouse(event) {
+    let vec = new THREE.Vector3() // create once and reuse
+    let pos = new THREE.Vector3() // create once and reuse
+
+    vec.set(
+      (event.clientX / window.innerWidth) * 2 - 1,
+      - (event.clientY / window.innerHeight) * 2 + 1,
+      0.5)
+
+    vec.unproject(this.camera)
+
+    vec.sub(this.camera.position).normalize()
+
+    const distance = -this.camera.position.y / vec.y
+
+    pos.copy(this.camera.position).add(vec.multiplyScalar(distance))
+    return pos
+  }
 
   setResizeHandler() {
     window.addEventListener('resize', () => {
@@ -74,12 +103,12 @@ export class GameScene {
   setUpCamera() {
     this.screenAspect = this.calcCameraAspect()
     this.camera = new THREE.PerspectiveCamera(65, this.screenAspect, 0.1, 1000)
-    this.camera.position.set(0, 10, 0)
+    this.camera.position.set(0, 10, 3)
     this.camera.lookAt(0, 0, 0)
     this.setCameraControlls()
   }
 
-  addObjectToScene(object) {
+  add(object) {
     this.scene.add(object)
   }
 
@@ -87,39 +116,39 @@ export class GameScene {
     this.cameraOptions = new CameraParams(this.camera)
     this.cameraTrigger = new CameraTrigger(this.camera)
     this.cameraTrigger.setSideTrigger(
-      this.cameraTrigger.left.el, 
-      'x', 
+      this.cameraTrigger.left.el,
+      'x',
       true)
     this.cameraTrigger.setSideTrigger(
-      this.cameraTrigger.right.el, 
-      'x', 
+      this.cameraTrigger.right.el,
+      'x',
       false)
     this.cameraTrigger.setSideTrigger(
-      this.cameraTrigger.top.el, 
-      'z', 
+      this.cameraTrigger.top.el,
+      'z',
       true)
     this.cameraTrigger.setSideTrigger(
-      this.cameraTrigger.bottom.el, 
-      'z', 
+      this.cameraTrigger.bottom.el,
+      'z',
       false)
     this.cameraTrigger.setCornerTrigger(
-      this.cameraTrigger.topLeft.el, 
-      true, 
+      this.cameraTrigger.topLeft.el,
+      true,
       true
     )
     this.cameraTrigger.setCornerTrigger(
-      this.cameraTrigger.topRight.el, 
-      false, 
+      this.cameraTrigger.topRight.el,
+      false,
       true
     )
     this.cameraTrigger.setCornerTrigger(
-      this.cameraTrigger.bottomLeft.el, 
-      true, 
+      this.cameraTrigger.bottomLeft.el,
+      true,
       false
     )
     this.cameraTrigger.setCornerTrigger(
-      this.cameraTrigger.bottomRight.el, 
-      false, 
+      this.cameraTrigger.bottomRight.el,
+      false,
       false
     )
   }

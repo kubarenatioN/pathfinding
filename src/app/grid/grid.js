@@ -19,7 +19,6 @@ export class Grid {
   }
 
   createGrid() {
-    console.log('draw grid');
     this.grid = []
     this.gridView && this.gridView.remove()
 
@@ -41,12 +40,12 @@ export class Grid {
       this.grid.push(gridRow)
       this.gridView.append(row)
     }
-    this.root.append(this.gridView)
+    // this.root.append(this.gridView)
     // this.onUpdate && this.onUpdate()
     this.setListeners()
     this.setStart()
-    this.setEnd()
-    this.redrawPath()
+    // this.setEnd()
+    // this.redrawPath()
   }
 
   findPath() {
